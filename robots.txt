@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://ex-experience.github.io/millennium/sitemap.xml
