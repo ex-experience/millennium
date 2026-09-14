@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /millennium/registry/
+Disallow: /millennium/en/registry/
 Sitemap: https://ex-experience.github.io/millennium/sitemap.xml
