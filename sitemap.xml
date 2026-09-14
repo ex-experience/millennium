@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://ex-experience.github.io/millennium/</loc></url>
-<url><loc>https://ex-experience.github.io/millennium/work/</loc></url>
-<url><loc>https://ex-experience.github.io/millennium/system/</loc></url>
-<url><loc>https://ex-experience.github.io/millennium/agency/</loc></url>
-<url><loc>https://ex-experience.github.io/millennium/contact/</loc></url>
-</urlset>
+  <url><loc>https://ex-experience.github.io/millennium/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/work/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/work/specimen-001/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/system/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/agency/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/contact/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/privacy/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/legal/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/work/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/work/specimen-001/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/system/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/agency/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/contact/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/privacy/</loc></url>
+  <url><loc>https://ex-experience.github.io/millennium/en/legal/</loc></url>
+<url><loc>https://ex-experience.github.io/millennium/registry/</loc></url><url><loc>https://ex-experience.github.io/millennium/en/registry/</loc></url></urlset>

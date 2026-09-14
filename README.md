@@ -1,25 +1,14 @@
-# MILLENNIUM V3 — Cinematic Editorial
+# MILLENNIUM — V3.1 Audit-Remediated Build
 
-Clean production rebuild of the experimental Grok site.
+Static bilingual creative-agency site for GitHub Pages or Vercel.
 
 ## Routes
-- `/` — Gateway / work takeover / instruments / evidence
-- `/work/` — immersive capability chapters
-- `/system/` — six-stage method
-- `/agency/` — house / branch constitution
-- `/contact/` — minimal project room
+Arabic: `/`, `/work/`, `/work/specimen-001/`, `/system/`, `/agency/`, `/contact/`, `/privacy/`, `/legal/`.
+English mirrors live under `/en/`.
 
-## V3 changes
-- Removed cards, SaaS iconography, generic pill UI, gradients-as-decoration, and Grok builder chrome.
-- Full-bleed sticky work frames and image-led editorial sequencing.
-- 12-column desktop composition and a separately tuned mobile cut.
-- Self-hosted captured fonts and WebP derivatives of source stills.
-- Arabic/English direction switching with persistent preference.
-- Source raster marks used without redrawing or adding ™ to MILLENNIUM.
-- Reduced-motion support, keyboard menu, skip link, SEO, sitemap, GitHub Pages + Vercel readiness.
+## No invented commercial claims
+`Specimen 001` is explicitly labelled self-initiated. No client, result, contact address or domain was fabricated.
 
-## Preview locally
-```bash
-python -m http.server 8080
-```
-Then open `http://localhost:8080`.
+## Deployment
+GitHub Pages: publish the folder root.
+Vercel: static deployment; `vercel.json` adds security headers unavailable on GitHub Pages.
