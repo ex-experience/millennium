@@ -49,3 +49,11 @@ main{min-height:100vh}.terminal-hero{min-height:100svh;position:relative;backgro
 .tm-lock{display:inline-flex;direction:ltr;unicode-bidi:isolate;flex-direction:row;align-items:flex-start;white-space:nowrap;vertical-align:baseline}
 .tm-lock>span{display:inline-block}.tm-lock>sup{display:inline-block;margin-left:.12em;font-family:PlexMonoLocal,monospace;font-size:.32em;line-height:1;letter-spacing:0;position:relative;top:.04em}
 .site-header .header-inner{direction:ltr}.site-header .brand-home{direction:ltr;unicode-bidi:isolate;order:0}.site-header .header-actions{direction:ltr;order:1}
+
+/* MILLENNIUM V5.0.2 — footer brand invariant */
+.public-brand .site-footer .footer-grid{direction:ltr}
+.public-brand .site-footer .footer-identity{direction:ltr;justify-self:start;text-align:left}
+.public-brand .site-footer .footer-mark{display:inline-flex;direction:ltr;unicode-bidi:isolate;align-items:flex-start;justify-content:flex-start;gap:6px}
+.public-brand .site-footer .footer-mark img{display:block}
+.public-brand .site-footer .footer-mark sup{display:inline-block;margin:0;font-family:PlexMonoLocal,monospace;font-size:8px;line-height:1;color:var(--signal);transform:translateY(-1px)}
+@media(max-width:780px){.public-brand .site-footer .footer-identity{justify-self:start;width:100%}.public-brand .site-footer .footer-mark{justify-content:flex-start}}
