@@ -57,3 +57,13 @@ main{min-height:100vh}.terminal-hero{min-height:100svh;position:relative;backgro
 .public-brand .site-footer .footer-mark img{display:block}
 .public-brand .site-footer .footer-mark sup{display:inline-block;margin:0;font-family:PlexMonoLocal,monospace;font-size:8px;line-height:1;color:var(--signal);transform:translateY(-1px)}
 @media(max-width:780px){.public-brand .site-footer .footer-identity{justify-self:start;width:100%}.public-brand .site-footer .footer-mark{justify-content:flex-start}}
+
+/* MILLENNIUM V5.1.0 — true bilingual surfaces */
+.ar .public-title{direction:rtl;text-align:right;letter-spacing:0;font-family:TajawalLocal,Arial,sans-serif;line-height:1.03}
+.ar .cap-grid h3,.ar .cap-grid p{text-align:right}
+.ar .cap-grid p{font-family:TajawalLocal,Arial,sans-serif;letter-spacing:0;font-size:clamp(15px,1.35vw,20px);line-height:1.9}
+.ar .principles b,.ar .principles span{text-align:right}
+.ar .founder-grid h2,.ar .founder-grid h3,.ar .founder-grid p{text-align:right}
+.ar .public-link{font-family:TajawalLocal,Arial,sans-serif;letter-spacing:0}
+.en .public-title{direction:ltr;text-align:left}
+@media(max-width:780px){.ar .public-title{font-size:clamp(44px,13vw,72px);line-height:1.04}}

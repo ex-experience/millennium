@@ -35,3 +35,13 @@ const form=document.getElementById('brief-form');if(form){const locale=form.data
   window.addEventListener('pointerdown',play,{once:true,passive:true});
 })();
 /* MILLENNIUM V4.1 HERO AUTOPLAY END */
+
+/* MILLENNIUM V5.1.0 — language route switch */
+;(()=>{
+  document.querySelectorAll('[data-lang-switch]').forEach(a=>{
+    a.addEventListener('click',()=>{
+      const base=a.dataset.base||a.getAttribute('href')||'/millennium/';
+      a.setAttribute('href',base+(location.hash||''));
+    });
+  });
+})();
