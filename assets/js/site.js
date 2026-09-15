@@ -1,84 +1,37 @@
 (()=>{
-const body=document.body;
-const menuBtn=document.getElementById('menu-toggle');
-const menu=document.getElementById('mobile-nav');
-let menuReturnFocus=null;
-const menuFocusable=()=>menu?[...menu.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')]:[];
-function openMenu(){if(!menu||!menuBtn)return;menuReturnFocus=document.activeElement;menu.classList.add('open');menu.removeAttribute('aria-hidden');menuBtn.setAttribute('aria-expanded','true');body.classList.add('menu-open');requestAnimationFrame(()=>menuFocusable()[0]?.focus())}
-function closeMenu({restore=true}={}){if(!menu||!menuBtn)return;menu.classList.remove('open');menu.setAttribute('aria-hidden','true');menuBtn.setAttribute('aria-expanded','false');body.classList.remove('menu-open');if(restore&&menuReturnFocus instanceof HTMLElement)menuReturnFocus.focus()}
-menuBtn?.addEventListener('click',()=>menuBtn.getAttribute('aria-expanded')==='true'?closeMenu():openMenu());
-menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>closeMenu({restore:false})));
-addEventListener('keydown',e=>{if(menuBtn?.getAttribute('aria-expanded')!=='true')return;if(e.key==='Escape'){e.preventDefault();closeMenu();return}if(e.key==='Tab'){const f=menuFocusable();if(!f.length){e.preventDefault();return}const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
-
-if('IntersectionObserver' in window){
- const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.classList.contains('copper-draw'))io.unobserve(e.target)}}),{threshold:.14});
- document.querySelectorAll('.reveal,.copper-draw').forEach(el=>io.observe(el));
- const scenes=[...document.querySelectorAll('.scene')];
- if(scenes.length){const sio=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){const n=e.target.dataset.scene;document.querySelectorAll('.scene-nav span').forEach((s,i)=>s.classList.toggle('active',String(i+1).padStart(2,'0')===n))}}),{threshold:.55});scenes.forEach(s=>sio.observe(s));}
-}else{document.querySelectorAll('.reveal,.copper-draw').forEach(el=>el.classList.add('in'));}
-
-const form=document.getElementById('brief-form');
-if(form){
- const locale=form.dataset.locale||'en';
- const status=document.getElementById('message-status');
- const sendBtn=document.getElementById('message-send');
- const saveBtn=document.getElementById('message-save');
- const fileInput=document.getElementById('sender-attachment');
- const started=document.getElementById('form-started-at');
- const success=document.getElementById('send-success');
- const maxFileBytes=2*1024*1024;
- const messages=locale==='ar'?{
-  sending:'جارٍ الإرسال…',sent:'تم الإرسال.',missing:'أكمل الحقول المطلوبة.',file:'المرفق أكبر من 2 MB.',network:'تعذر الإرسال الآن. استخدم الاتصال أو واتساب، أو حاول مرة أخرى.',config:'بوابة الإرسال غير مهيأة بعد.',saved:'تم حفظ نسخة محلية.'
- }:{
-  sending:'Sending…',sent:'Sent.',missing:'Complete the required fields.',file:'The attachment is larger than 2 MB.',network:'Unable to send right now. Use Call or WhatsApp, or try again.',config:'The message gateway is not configured yet.',saved:'Local copy saved.'
- };
- if(started)started.value=String(Date.now());
- const setStatus=(text,type='')=>{if(status){status.textContent=text;status.dataset.state=type}};
- const fileAsPayload=file=>new Promise((resolve,reject)=>{if(!file){resolve(null);return}if(file.size>maxFileBytes){reject(new Error('file_too_large'));return}const r=new FileReader();r.onload=()=>{const value=String(r.result||'');const comma=value.indexOf(',');resolve({name:file.name,type:file.type||'application/octet-stream',size:file.size,data:comma>=0?value.slice(comma+1):''})};r.onerror=()=>reject(new Error('file_read'));r.readAsDataURL(file)});
- const makeLocalCopy=()=>{if(!form.reportValidity()){setStatus(messages.missing,'error');return}const d=new FormData(form);const text=[locale==='ar'?'MILLENNIUM — نسخة رسالة محلية':'MILLENNIUM — Local message copy','',`${locale==='ar'?'الاسم':'Name'}: ${d.get('name')||''}`,`${locale==='ar'?'البريد':'Email'}: ${d.get('email')||''}`,'',`${locale==='ar'?'الرسالة':'Message'}:` ,String(d.get('message')||''),'',`${locale==='ar'?'المرفق':'Attachment'}: ${fileInput?.files?.[0]?.name||'—'}`].join('\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='MILLENNIUM-message-copy.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus(messages.saved,'ok')};
- saveBtn?.addEventListener('click',makeLocalCopy);
- fileInput?.addEventListener('change',()=>{const f=fileInput.files?.[0];if(f&&f.size>maxFileBytes){fileInput.value='';setStatus(messages.file,'error')}});
- form.addEventListener('submit',async e=>{
-  e.preventDefault();
-  if(!form.reportValidity()){setStatus(messages.missing,'error');return}
-  const endpoint=String(window.MILLENNIUM_CONTACT_ENDPOINT||'');
-  if(!endpoint||endpoint.includes('__CONTACT_ENDPOINT__')){setStatus(messages.config,'error');return}
-  const data=new FormData(form);
-  const file=fileInput?.files?.[0]||null;
-  if(file&&file.size>maxFileBytes){setStatus(messages.file,'error');return}
-  sendBtn?.setAttribute('disabled','');form.setAttribute('aria-busy','true');setStatus(messages.sending,'sending');
-  try{
-   const attachment=await fileAsPayload(file);
-   const payload={name:String(data.get('name')||'').trim(),email:String(data.get('email')||'').trim(),message:String(data.get('message')||'').trim(),companyWebsite:String(data.get('companyWebsite')||''),startedAt:Number(data.get('startedAt')||0),locale,sourceUrl:location.href,attachment};
-   const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),credentials:'omit',referrerPolicy:'strict-origin-when-cross-origin'});
-   const result=await response.json().catch(()=>({}));
-   if(!response.ok||!result.ok)throw new Error(result.error||`http_${response.status}`);
-   setStatus(messages.sent,'ok');form.reset();
-   if(success){success.setAttribute('aria-hidden','false');success.classList.add('is-visible');document.body.classList.add('message-confirmed')}
-   setTimeout(()=>{location.assign(locale==='ar'?'../':'../../en/')},1800);
-  }catch(err){console.warn('Message send failed:',err?.message||err);setStatus(err?.message==='file_too_large'?messages.file:messages.network,'error');sendBtn?.removeAttribute('disabled');form.removeAttribute('aria-busy')}
- });
-}
-
-
-const heroSequence=document.querySelector('[data-hero-sequence]');
-if(heroSequence){
- const frames=[...heroSequence.querySelectorAll('.hero-seq-frame')];
- const controls=[...heroSequence.querySelectorAll('[data-hero-stage]')];
- const label=document.getElementById('hero-stage-label');
- const status=document.getElementById('hero-stage-status');
- const replay=document.getElementById('hero-replay');
- const canvas=heroSequence.querySelector('.hero-seq-canvas');
- const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- const meta=[['01 / OUTLINE','MASTER RASTER / CONSTRUCTION'],['02 / BLUEPRINT','SOURCE LETTERS / FILLED'],['03 / MEASURED','SOURCE UNTOUCHED / MEASURED'],['04 / FINAL','WHITE MARK / NIGHT FIELD']];
- let active=0,timer=null,autoplay=true;
- const setStage=(n,{manual=false}={})=>{active=Math.max(0,Math.min(frames.length-1,n));frames.forEach((f,i)=>f.classList.toggle('is-active',i===active));controls.forEach((b,i)=>{b.classList.toggle('is-active',i===active);b.setAttribute('aria-pressed',String(i===active))});heroSequence.dataset.stage=String(active);if(label)label.textContent=meta[active][0];if(status)status.textContent=meta[active][1];if(manual)autoplay=false};
- const stop=()=>{if(timer){clearTimeout(timer);timer=null}};
- const run=()=>{stop();autoplay=true;setStage(reduced?frames.length-1:0);if(reduced)return;const next=()=>{if(!autoplay||active>=frames.length-1){stop();return}timer=setTimeout(()=>{setStage(active+1);next()},1500)};next()};
- controls.forEach((b,i)=>b.addEventListener('click',()=>{stop();setStage(i,{manual:true})}));
- replay?.addEventListener('click',run);
- heroSequence.addEventListener('pointermove',e=>{if(reduced||e.pointerType==='touch'||!canvas)return;const r=heroSequence.getBoundingClientRect();const x=((e.clientX-r.left)/r.width-.5)*4;const y=((e.clientY-r.top)/r.height-.5)*3;canvas.style.transform=`translate3d(${x}px,${y}px,0)`});
- heroSequence.addEventListener('pointerleave',()=>canvas?.style.removeProperty('transform'));
- run();
-}
+const body=document.body;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const menu=document.getElementById('mobile-nav'),btn=document.getElementById('menu-toggle');let returnFocus=null;
+const focusable=()=>menu?[...menu.querySelectorAll('a[href],button:not([disabled])')]:[];
+function open(){if(!menu||!btn)return;returnFocus=document.activeElement;menu.classList.add('open');menu.removeAttribute('aria-hidden');btn.setAttribute('aria-expanded','true');focusable()[0]?.focus()}
+function close(restore=true){if(!menu||!btn)return;menu.classList.remove('open');menu.setAttribute('aria-hidden','true');btn.setAttribute('aria-expanded','false');if(restore&&returnFocus instanceof HTMLElement)returnFocus.focus()}
+btn?.addEventListener('click',()=>btn.getAttribute('aria-expanded')==='true'?close():open());menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>close(false)));
+addEventListener('keydown',e=>{if(btn?.getAttribute('aria-expanded')!=='true')return;if(e.key==='Escape'){e.preventDefault();close();return}if(e.key==='Tab'){const f=focusable();if(!f.length)return;const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+if('IntersectionObserver' in window&&!reduced){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el))}else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+if(fine&&!reduced){const dot=document.createElement('div');dot.className='cursor-dot';dot.setAttribute('aria-hidden','true');const read=document.createElement('div');read.className='cursor-readout';read.setAttribute('aria-hidden','true');read.textContent='X 0000 / Y 0000';document.body.append(dot,read);body.classList.add('cursor-enabled');addEventListener('pointermove',e=>{dot.style.transform=`translate(${e.clientX}px,${e.clientY}px) translate(-50%,-50%)`;read.textContent=`X ${String(Math.round(e.clientX)).padStart(4,'0')} / Y ${String(Math.round(e.clientY)).padStart(4,'0')}`},{passive:true})}
+if(!reduced){document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a||a.target==='_blank'||a.hasAttribute('download')||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;const u=new URL(a.href,location.href);if(u.origin!==location.origin||u.hash&&u.pathname===location.pathname)return;e.preventDefault();body.classList.add('blackout');setTimeout(()=>location.href=u.href,78)})}
+const form=document.getElementById('brief-form');if(form){const locale=form.dataset.locale||'en',status=document.getElementById('message-status'),send=document.getElementById('message-send'),save=document.getElementById('message-save'),file=document.getElementById('sender-attachment'),started=document.getElementById('form-started-at'),success=document.getElementById('send-success');const max=2*1024*1024;const m=locale==='ar'?{sending:'جارٍ الإرسال…',sent:'تم الإرسال.',missing:'أكمل الحقول المطلوبة.',file:'المرفق أكبر من 2 MB.',network:'تعذر الإرسال الآن. استخدم الاتصال أو واتساب، أو حاول مرة أخرى.',config:'بوابة الإرسال غير مهيأة.',saved:'تم حفظ نسخة محلية.'}:{sending:'Transmitting…',sent:'Transmitted.',missing:'Complete the required fields.',file:'Attachment exceeds 2 MB.',network:'Transmission failed. Use Call or WhatsApp, or retry.',config:'Message gateway is not configured.',saved:'Local copy extracted.'};if(started)started.value=String(Date.now());const set=(t,s='')=>{if(status){status.textContent=t;status.dataset.state=s}};const filePayload=f=>new Promise((resolve,reject)=>{if(!f){resolve(null);return}if(f.size>max){reject(new Error('file_too_large'));return}const r=new FileReader();r.onload=()=>{const v=String(r.result||''),i=v.indexOf(',');resolve({name:f.name,type:f.type||'application/octet-stream',size:f.size,data:i>=0?v.slice(i+1):''})};r.onerror=()=>reject(new Error('file_read'));r.readAsDataURL(f)});const compose=()=>{const d=new FormData(form),purpose=String(d.get('purpose')||''),role=String(d.get('role')||''),msg=String(d.get('message')||'').trim();return `[PURPOSE] ${purpose||'—'}\n[ROLE] ${role||'—'}\n\n${msg}`};save?.addEventListener('click',()=>{if(!form.reportValidity()){set(m.missing,'error');return}const d=new FormData(form),txt=[locale==='ar'?'MILLENNIUM — نسخة محلية':'MILLENNIUM — Local Extract','',`Name: ${d.get('name')||''}`,`Email: ${d.get('email')||''}`,`Purpose: ${d.get('purpose')||''}`,`Role: ${d.get('role')||''}`,'',String(d.get('message')||'')].join('\n');const b=new Blob([txt],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='MILLENNIUM-initiate.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),500);set(m.saved,'ok')});form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValidity()){set(m.missing,'error');return}const endpoint=String(window.MILLENNIUM_CONTACT_ENDPOINT||'');if(!endpoint){set(m.config,'error');return}const d=new FormData(form),f=file?.files?.[0]||null;if(f&&f.size>max){set(m.file,'error');return}send?.setAttribute('disabled','');form.setAttribute('aria-busy','true');set(m.sending,'sending');try{const attachment=await filePayload(f);const payload={name:String(d.get('name')||'').trim(),email:String(d.get('email')||'').trim(),message:compose(),companyWebsite:String(d.get('companyWebsite')||''),startedAt:Number(d.get('startedAt')||0),locale,sourceUrl:location.href,attachment};const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),credentials:'omit',referrerPolicy:'strict-origin-when-cross-origin'});const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error(j.error||`http_${r.status}`);set(m.sent,'ok');form.reset();success?.classList.add('is-visible');success?.setAttribute('aria-hidden','false');setTimeout(()=>location.assign(locale==='ar'?'../':'../../en/'),1500)}catch(err){set(err?.message==='file_too_large'?m.file:m.network,'error');send?.removeAttribute('disabled');form.removeAttribute('aria-busy')}})}
 })();
+/* MILLENNIUM V4.1 HERO AUTOPLAY START */
+;(()=>{
+  const video=document.querySelector('.hero-video');
+  if(!video)return;
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  video.muted=true;
+  video.defaultMuted=true;
+  video.setAttribute('muted','');
+  video.playsInline=true;
+  if(reduce){try{video.pause()}catch(_){};return}
+  const play=()=>{
+    try{
+      const p=video.play();
+      if(p&&typeof p.catch==='function')p.catch(()=>{});
+    }catch(_){}
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',play,{once:true});
+  else play();
+  window.addEventListener('pageshow',play);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')play()});
+  window.addEventListener('touchstart',play,{once:true,passive:true});
+  window.addEventListener('pointerdown',play,{once:true,passive:true});
+})();
+/* MILLENNIUM V4.1 HERO AUTOPLAY END */

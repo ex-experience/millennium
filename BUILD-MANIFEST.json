@@ -1,18 +1,27 @@
 {
-  "release": "MILLENNIUM V3.4",
-  "generated": "2026-09-14",
-  "public_site": "GitHub Pages",
-  "private_gateway": "Vercel Functions",
-  "recipient_mailbox_embedded_in_frontend": false,
-  "features": [
-    "V3.3 field-audit hotfixes retained",
-    "Private server-side message gateway",
-    "Required visitor name and email",
-    "Optional single attachment up to 2 MB",
-    "Phone + WhatsApp direct channels",
-    "Official MILLENNIUM / EX / founder Instagram links",
-    "Success confirmation then automatic return",
-    "No advertising analytics or marketing cookies"
+  "release": "v4.0.0",
+  "system": "OMNISYNTH EXECUTIVE SYSTEM BUILD V1.0",
+  "baseProductionSha": "b6074d0e441196ac40db402706f575decbeab64f",
+  "contactGateway": "https://millennium-contact-gateway.vercel.app/api/contact",
+  "publicRoutes": [
+    "",
+    "assets/",
+    "institution/",
+    "system/",
+    "protocol/",
+    "contact/",
+    "privacy/",
+    "legal/",
+    "registry/",
+    "en/",
+    "en/assets/",
+    "en/institution/",
+    "en/system/",
+    "en/protocol/",
+    "en/contact/",
+    "en/privacy/",
+    "en/legal/",
+    "en/registry/"
   ],
-  "binding": "assets/js/contact-config.js is populated locally after the private Vercel gateway is deployed."
+  "privatePromptPackPublished": false
 }
