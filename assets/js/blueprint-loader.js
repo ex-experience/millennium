@@ -2,8 +2,7 @@
 ;(()=>{
   const shell=document.getElementById('brand-loader');
   if(!shell){document.body.classList.remove('intro-pending');return}
-  const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const DURATION=REDUCED?1200:15033;
+  const DURATION=15033;
   const QA_TIME=location.hostname==='127.0.0.1'?Math.max(0,Math.min(DURATION,Number(new URLSearchParams(location.search).get('loaderTime')||0))):0;
   const LOGO={w:1475,h:300,bx:31,by:117,bw:1412,bh:158};
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

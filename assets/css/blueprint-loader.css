@@ -21,4 +21,3 @@ body.intro-pending{overflow:hidden!important;height:100svh;touch-action:none;ove
 @keyframes blSolid{0%,5.8%{opacity:1}8.2%,77%{opacity:0}82%{opacity:.15}86%,100%{opacity:1}}
 @keyframes blFinalMeta{0%,84%{opacity:0}90%,100%{opacity:1}}
 @keyframes blScan{0%{transform:translate3d(0,0,0);opacity:0}8%{opacity:.58}92%{opacity:.32}100%{transform:translate3d(650%,0,0);opacity:0}}
-@media(prefers-reduced-motion:reduce){.bl-blue,.bl-grid,.bl-blueprint,.bl-logo-outline{display:none}.bl-logo-solid{animation:none;opacity:1}.bl-final-meta{animation:none;opacity:1}.brand-loader:before{display:none}.brand-loader{transition:opacity .3s ease}}
